@@ -21,47 +21,94 @@ import Foundation
 class TemplatesAnnotationParserPassInlineCodeSpec: QuickSpec {
     override func spec() {
         describe("InlineParser") {
-            context("without indentation") {
-                let source =
-                    "// sourcery:inline:Type.AutoCoding\n" +
-                        "var something: Int\n" +
-                "// sourcery:end\n"
+            context("with type") {
+                context("without indentation") {
+                    let source =
+                        "// sourcery:inline:Type.AutoCoding\n" +
+                            "var something: Int\n" +
+                    "// sourcery:end\n"
 
-                let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
+                    let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
 
-                it("tracks it") {
-                    let annotatedRanges = result.annotatedRanges["Type.AutoCoding"]
-                    expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 35, length: 19)]))
-                    expect(annotatedRanges?.map { $0.indentation }).to(equal([""]))
+                    it("tracks it") {
+                        let annotatedRanges = result.annotatedRanges["Type.AutoCoding"]
+                        expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 35, length: 19)]))
+                        expect(annotatedRanges?.map { $0.indentation }).to(equal([""]))
+                    }
+
+                    it("does not remove content between the markup when force parse parameter is set to template name") {
+                        expect(result.contents).to(equal("// sourcery:inline:Type.AutoCoding\n" +
+                            "var something: Int\n" +
+                            "// sourcery:end\n"
+                        ))
+                    }
                 }
 
-                it("does not remove content between the markup when force parse parameter is set to template name") {
-                    expect(result.contents).to(equal("// sourcery:inline:Type.AutoCoding\n" +
-                        "var something: Int\n" +
-                        "// sourcery:end\n"
-                    ))
+                context("with indentation") {
+                    let source =
+                        "    // sourcery:inline:Type.AutoCoding\n" +
+                            "    var something: Int\n" +
+                    "    // sourcery:end\n"
+
+                    let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
+
+                    it("tracks it") {
+                        let annotatedRanges = result.annotatedRanges["Type.AutoCoding"]
+                        expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 39, length: 23)]))
+                        expect(annotatedRanges?.map { $0.indentation }).to(equal(["    "]))
+                    }
+
+                    it("does not remove the content between the markup when force parse parameter is set to template name") {
+                        expect(result.contents).to(equal( "    // sourcery:inline:Type.AutoCoding\n" +
+                            "    var something: Int\n" +
+                            "    // sourcery:end\n"
+    ))
+                    }
                 }
             }
+            context("without type") {
+                context("without indentation") {
+                    let source =
+                        "// sourcery:inline:AutoCoding\n" +
+                            "var something: Int\n" +
+                    "// sourcery:end\n"
 
-            context("with indentation") {
-                let source =
-                    "    // sourcery:inline:Type.AutoCoding\n" +
-                        "    var something: Int\n" +
-                "    // sourcery:end\n"
+                    let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
 
-                let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
+                    it("tracks it") {
+                        let annotatedRanges = result.annotatedRanges["AutoCoding"]
+                        expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 30, length: 19)]))
+                        expect(annotatedRanges?.map { $0.indentation }).to(equal([""]))
+                    }
 
-                it("tracks it") {
-                    let annotatedRanges = result.annotatedRanges["Type.AutoCoding"]
-                    expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 39, length: 23)]))
-                    expect(annotatedRanges?.map { $0.indentation }).to(equal(["    "]))
+                    it("does not remove content between the markup when force parse parameter is set to template name") {
+                        expect(result.contents).to(equal("// sourcery:inline:AutoCoding\n" +
+                            "var something: Int\n" +
+                            "// sourcery:end\n"
+                        ))
+                    }
                 }
 
-                it("does not remove the content between the markup when force parse parameter is set to template name") {
-                    expect(result.contents).to(equal( "    // sourcery:inline:Type.AutoCoding\n" +
-                        "    var something: Int\n" +
-                        "    // sourcery:end\n"
-))
+                context("with indentation") {
+                    let source =
+                        "    // sourcery:inline:AutoCoding\n" +
+                            "    var something: Int\n" +
+                    "    // sourcery:end\n"
+
+                    let result = TemplateAnnotationsParser.parseAnnotations("inline", contents: source, aggregate: false, forceParse: ["AutoCoding"])
+
+                    it("tracks it") {
+                        let annotatedRanges = result.annotatedRanges["AutoCoding"]
+                        expect(annotatedRanges?.map { $0.range }).to(equal([NSRange(location: 34, length: 23)]))
+                        expect(annotatedRanges?.map { $0.indentation }).to(equal(["    "]))
+                    }
+
+                    it("does not remove the content between the markup when force parse parameter is set to template name") {
+                        expect(result.contents).to(equal( "    // sourcery:inline:AutoCoding\n" +
+                            "    var something: Int\n" +
+                            "    // sourcery:end\n"
+    ))
+                    }
                 }
             }
         }
