@@ -59,7 +59,7 @@ public class Sourcery {
     ///   - files: Path of files to process, can be directory or specific file.
     ///   - templatePath: Specific Template to use for code generation.
     ///   - output: Path to output source code to.
-    ///   - forceParse: extensions of generated sourcery file that can be parsed
+    ///   - forceParse: extensions or annotations of generated sourcery file that can be parsed
     ///   - watcherEnabled: Whether daemon watcher should be enabled.
     /// - Throws: Potential errors.
     public func processFiles(_ source: Source, usingTemplates templatesPaths: Paths, output: Output, forceParse: [String] = []) throws -> [FolderWatcher.Local]? {
